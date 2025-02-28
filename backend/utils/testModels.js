@@ -4,6 +4,7 @@ const Job = require('../models/Job');
 const Resume = require('../models/Resume');
 const dotenv = require('dotenv');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 // Update the path to .env file
 dotenv.config({ path: path.join(__dirname, '../../backend/.env') });
@@ -45,6 +46,15 @@ async function testModels() {
       content: 'Test resume content with experience in JavaScript and Node.js'
     });
     console.log('Created test resume:', resume);
+
+    // Create a test admin user
+    const adminUser = await User.create({
+      email: 'admin@example.com',
+      password: await bcrypt.hash('admin123', 10),
+      name: 'Admin User',
+      role: 'admin'  // This makes them an admin
+    });
+    console.log('Created admin user:', adminUser);
 
     // Clean up (optional - comment out if you want to keep the test data)
     await User.deleteOne({ _id: user._id });

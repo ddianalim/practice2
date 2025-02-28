@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
+const { auth, isAdmin } = require('../middleware/auth');
 
 // Get all jobs
 router.get('/', async (req, res) => {
@@ -26,7 +27,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create job
-router.post('/', async (req, res) => {
+router.post('/', auth, isAdmin, async (req, res) => {
   try {
     const { title, company, description, requirements, location, type } = req.body;
     const job = await Job.create({
@@ -44,7 +45,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update job
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, isAdmin, async (req, res) => {
   try {
     const job = await Job.findByIdAndUpdate(
       req.params.id,
@@ -61,7 +62,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete job
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, isAdmin, async (req, res) => {
   try {
     const job = await Job.findByIdAndDelete(req.params.id);
     if (!job) {
