@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
 const { auth, isAdmin } = require('../middleware/auth');
+const { getEmbedding } = require('../utils/aiMatching');
 
 // Get all jobs
 router.get('/', async (req, res) => {
@@ -30,13 +31,19 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, isAdmin, async (req, res) => {
   try {
     const { title, company, description, requirements, location, type } = req.body;
+    
+    // Generate embedding from combined job text
+    const jobText = `${title} ${description} ${requirements.join(' ')}`;
+    const embedding = await getEmbedding(jobText);
+    
     const job = await Job.create({
       title,
       company,
       description,
       requirements,
       location,
-      type
+      type,
+      embedding
     });
     res.status(201).json(job);
   } catch (error) {

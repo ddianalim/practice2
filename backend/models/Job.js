@@ -10,6 +10,7 @@ const jobSchema = new mongoose.Schema({
   requirements: [String],
   location: String,
   type: String,
+  embedding: [Number],
   createdAt: {
     type: Date,
     default: Date.now

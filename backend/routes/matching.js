@@ -3,6 +3,7 @@ const router = express.Router();
 const Resume = require('../models/Resume');
 const Job = require('../models/Job');
 const { auth } = require('../middleware/auth');
+const { calculateJobMatch } = require('../utils/aiMatching');
 
 // Get job matches for a resume
 router.get('/resume/:resumeId/jobs', auth, async (req, res) => {
@@ -17,16 +18,19 @@ router.get('/resume/:resumeId/jobs', auth, async (req, res) => {
       return res.status(404).json({ message: 'Resume not found' });
     }
 
-    // TODO: Implement AI matching logic here
+    // Get embeddings and calculate scores
     const jobs = await Job.find();
-    
-    // For now, return all jobs (we'll add scoring later)
+    const matches = await Promise.all(jobs.map(async (job) => ({
+      job,
+      score: await calculateJobMatch(resume, job)
+    })));
+
+    // Sort by score descending
+    matches.sort((a, b) => b.score - a.score);
+
     res.json({
       resume,
-      matches: jobs.map(job => ({
-        job,
-        score: 0 // Placeholder for AI similarity score
-      }))
+      matches
     });
   } catch (error) {
     res.status(500).json({ message: 'Error finding matches', error: error.message });
@@ -43,14 +47,17 @@ router.get('/job/:jobId/candidates', auth, async (req, res) => {
 
     // TODO: Implement AI matching logic here
     const resumes = await Resume.find().populate('userId', 'name email');
+    const matches = await Promise.all(resumes.map(async (resume) => ({
+      resume,
+      score: await calculateJobMatch(resume, job)
+    })));
 
-    // For now, return all candidates (we'll add scoring later)
+    // Sort by score descending
+    matches.sort((a, b) => b.score - a.score);
+
     res.json({
       job,
-      matches: resumes.map(resume => ({
-        resume,
-        score: 0 // Placeholder for AI similarity score
-      }))
+      matches
     });
   } catch (error) {
     res.status(500).json({ message: 'Error finding matches', error: error.message });

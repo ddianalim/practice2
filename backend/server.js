@@ -20,16 +20,18 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-// Basic route for testing
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
-
 // Add after the middleware setup
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/matching', matchingRoutes);
+
+// Add after dotenv.config()
+console.log('Environment variables loaded:', {
+  MONGO_URI: process.env.MONGO_URI ? 'Set' : 'Not set',
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set',
+  PORT: process.env.PORT || 5001
+});
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

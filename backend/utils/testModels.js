@@ -21,10 +21,10 @@ async function testModels() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
-    // Create a test user
+    // Create a test user with hashed password
     const user = await User.create({
       email: 'test@example.com',
-      password: 'testpassword123',
+      password: await bcrypt.hash('testpassword123', 10),
       name: 'Test User'
     });
     console.log('Created test user:', user);
@@ -57,10 +57,10 @@ async function testModels() {
     console.log('Created admin user:', adminUser);
 
     // Clean up (optional - comment out if you want to keep the test data)
-    await User.deleteOne({ _id: user._id });
-    await Job.deleteOne({ _id: job._id });
-    await Resume.deleteOne({ _id: resume._id });
-    console.log('Cleaned up test data');
+    // await User.deleteOne({ _id: user._id });
+    // await Job.deleteOne({ _id: job._id });
+    // await Resume.deleteOne({ _id: resume._id });
+    // console.log('Cleaned up test data');
 
   } catch (error) {
     console.error('Error:', error);

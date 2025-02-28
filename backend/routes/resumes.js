@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Resume = require('../models/Resume');
 const { auth } = require('../middleware/auth');
+const { getEmbedding } = require('../utils/aiMatching');
 
 // Get user's resumes
 router.get('/', auth, async (req, res) => {
@@ -17,9 +18,11 @@ router.get('/', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { content } = req.body;
+    const embedding = await getEmbedding(content);
     const resume = await Resume.create({
       userId: req.user.userId,
-      content
+      content,
+      embedding
     });
     res.status(201).json(resume);
   } catch (error) {
