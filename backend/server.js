@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
+const jobRoutes = require('./routes/jobs');
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 
 // Add after the middleware setup
 app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
